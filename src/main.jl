@@ -17,3 +17,12 @@ plot(df.Datetime, df.PJME_MW,
      linewidth= 0.5,
      size=(800, 400))
 
+format = dateformat"yyyy-mm-dd HH:MM:SS"
+dt = DateTime.(df.Datetime, format)
+
+df.hour = hour.(dt)
+df.dayOfTheWeek = dayofweek.(dt)
+df.month = month.(dt)
+df.isWeekend = df.dayOfTheWeek .>= 6
+
+sort!(df, :Datetime)
