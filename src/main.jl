@@ -65,6 +65,14 @@ function trainModel(trainDf::DataFrame)
     return lm(@formula(target ~ hour + dayOfWeek + month + isWeekend + prevHour + prev24h), trainDf)
 end
 
+function calcMetrics(actual::Vector, predicted::Vector)
+    MSE = mean((actual - predicted).^2)
+    RSME = sqrt(MSE)
+    MAE = mean(abs.(actual - predicted))
+    R2 = 1 - sum((actual - predicted).^2) / sum((actual .- mean(actual)).^2)
+    return MSE, RSME, MAE, R2
+end
+
 function mainAnalysis(filepath::String)
     df = loadPjmData(filepath)
     df.Datetime = processDate(df)
@@ -77,8 +85,6 @@ function mainAnalysis(filepath::String)
     testDf = splitTestData(dfClean)
 
     model = trainModel(trainDf)
-
-
 end
 
 mainAnalysis("/home/amirmhmd/code/electricity-predictor-julia/data/PJME_hourly.csv")
