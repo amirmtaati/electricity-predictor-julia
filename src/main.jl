@@ -45,12 +45,12 @@ function createTargetVariable(df::DataFrame, consumptionCol::Symbol)
 end
 
 function splitTrainData(df::DataFrame, trainRatio::Float64=0.8)
-    nTrain = Int(trainRatio * nrow(df))
+    nTrain = Int(round(trainRatio * nrow(df)))
     return df[1:nTrain, :]
 end
 
 function splitTestData(df::DataFrame, trainRatio::Float64=0.8)
-    nTrain = Int(trainRatio * nrow(df))
+    nTrain = Int(round(trainRatio * nrow(df)))
     return df[(nTrain+1):end, :]
 end
 
@@ -61,8 +61,16 @@ function plotTimeSeries(df::DataFrame, dateCol::Symbol, valueCol::Symbol; title:
          linewidth=0.5, size=(800, 400))
 end
 
+function plotPredictions(actual::Vector, predicted::Vector, dates::Vector)
+    """Plot actual vs predicted consumption"""
+    plot(dates, [actual predicted],
+         title="Actual vs Predicted Consumption",
+         xlabel="Date", ylabel="Consumption (MW)",
+         label=["Actual" "Predicted"], linewidth=2)
+end
+
 function trainModel(trainDf::DataFrame)
-    return lm(@formula(target ~ hour + dayOfWeek + month + isWeekend + prevHour + prev24h), trainDf)
+    return lm(@formula(target ~ hour + dayOfTheWeek + month + isWeekend + prevHour + prev24h), trainDf)
 end
 
 function calcMetrics(actual::Vector, predicted::Vector)
@@ -85,7 +93,14 @@ function mainAnalysis(filepath::String)
     testDf = splitTestData(dfClean)
 
     model = trainModel(trainDf)
+
+    testPred = predict(model, testDf)
+    metrics = calcMetrics(testDf.target, testPred)
+
+    plotPredictions(testDf.target, testPred, testDf.Datetime)
+
+    return model, metrics
 end
 
-mainAnalysis("/home/amirmhmd/code/electricity-predictor-julia/data/PJME_hourly.csv")
+model, performance = mainAnalysis("/home/amirmhmd/code/electricity-predictor-julia/data/PJME_hourly.csv")
 
