@@ -26,3 +26,8 @@ df.month = month.(dt)
 df.isWeekend = df.dayOfTheWeek .>= 6
 
 sort!(df, :Datetime)
+
+df.prevHour = [missing; df.PJME_MW[1:end-1]]
+df.prev24Hour = [fill(24, missing); df.PJME_MW[1:end-24]]
+df.prevWeek = [fill(missing, 24*7), df.PJME_MW[1:end-24*7]]
+
