@@ -61,6 +61,10 @@ function plotTimeSeries(df::DataFrame, dateCol::Symbol, valueCol::Symbol; title:
          linewidth=0.5, size=(800, 400))
 end
 
+function trainModel(trainDf::DataFrame)
+    return lm(@formula(target ~ hour + dayOfWeek + month + isWeekend + prevHour + prev24h), trainDf)
+end
+
 function mainAnalysis(filepath::String)
     df = loadPjmData(filepath)
     df.Datetime = processDate(df)
@@ -71,6 +75,10 @@ function mainAnalysis(filepath::String)
 
     trainDf = splitTrainData(dfClean)
     testDf = splitTestData(dfClean)
+
+    model = trainModel(trainDf)
+
+
 end
 
 mainAnalysis("/home/amirmhmd/code/electricity-predictor-julia/data/PJME_hourly.csv")
