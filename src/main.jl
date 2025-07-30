@@ -44,6 +44,16 @@ function createTargetVariable(df::DataFrame, consumptionCol::Symbol)
     return dfCopy
 end
 
+function splitTrainData(df::DataFrame, trainRatio::Float64=0.8)
+    nTrain = Int(trainRatio * nrow(df))
+    return df[1:nTrain, :]
+end
+
+function splitTestData(df::DataFrame, trainRatio::Float64=0.8)
+    nTrain = Int(trainRatio * nrow(df))
+    return df[(nTrain+1):end, :]
+end
+
 function plotTimeSeries(df::DataFrame, dateCol::Symbol, valueCol::Symbol; title::String="Time Series")
     """Plot basic time series"""
     plot(df[!, dateCol], df[!, valueCol],
@@ -58,6 +68,9 @@ function mainAnalysis(filepath::String)
     df = createLagFeatures(df, :PJME_MW)
     df = createTargetVariable(df, :PJME_MW)
     dfClean = dropmissing(df)
+
+    trainDf = splitTrainData(dfClean)
+    testDf = splitTestData(dfClean)
 end
 
 mainAnalysis("/home/amirmhmd/code/electricity-predictor-julia/data/PJME_hourly.csv")
