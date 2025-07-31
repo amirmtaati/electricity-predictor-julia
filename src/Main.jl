@@ -11,7 +11,7 @@ using .Features
 using .Modeling
 using .Evaluation
 using .Plotting
-using DataFrames, GLM, Statistics
+using DataFrames, GLM, Statistics, Plots
 
 function main()
     if length(ARGS) < 1
