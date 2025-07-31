@@ -14,6 +14,7 @@ function plotPredictions(actual::Vector, predicted::Vector, dates::Vector)
          title="Actual vs Predicted Consumption",
          xlabel="Date", ylabel="Consumption (MW)",
          label=["Actual" "Predicted"], linewidth=2)
+    savefig("pred.png")
 end
 
 end
